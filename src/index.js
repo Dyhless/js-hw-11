@@ -6,8 +6,6 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 import { refs } from './js/refs.js';
 import API from './js/api.js';
 
-console.log(API);
-
 /*
 
 1. Get refs 
@@ -25,8 +23,14 @@ console.log(API);
 refs.form.addEventListener('submit', onSubmit);
 
 function onSubmit(event) { 
-   event.peventDefault();
+   event.preventDefault();
    const form = event.currentTarget;
-   const value = form.elements.value.trim();
-   API.getPictures(value).then((result) => console.log(result));
+   const value = form.elements.searchQuery.value.trim();
+   API.getPictures(value)
+      .then((result) => console.log(result))
+      .catch(onError);
+}
+
+function onError(error) { 
+   console.log(error);
 }
