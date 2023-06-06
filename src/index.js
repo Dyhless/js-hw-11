@@ -26,5 +26,7 @@ refs.form.addEventListener('submit', onSubmit);
 
 function onSubmit(event) { 
    event.peventDefault();
-   console.log(event.currentTarget.elements);
+   const form = event.currentTarget;
+   const value = form.elements.value.trim();
+   API.getPictures(value).then((result) => console.log(result));
 }
