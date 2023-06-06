@@ -13,8 +13,9 @@ async function getPictures(query) {
       return result;
    } catch (error) {
       console.error('Error:', error);
-      Notiflix.Notify.failure('Не удалось загрузить изображения. Пожалуйста, повторите попытку позже.');
+      throw error; // rethrow the error to be caught in the `onError` function
    }
 }
 
 export default { getPictures };
+

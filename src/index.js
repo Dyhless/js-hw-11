@@ -26,6 +26,11 @@ function onSubmit(event) {
    event.preventDefault();
    const form = event.currentTarget;
    const value = form.elements.searchQuery.value.trim();
+
+   if (value === "") { 
+      return Notiflix.Notify.failure('Please enter something in search field');
+   }
+   
    API.getPictures(value)
       .then((result) => console.log(result))
       .catch(onError);
