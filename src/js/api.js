@@ -10,9 +10,9 @@ async function getPictures(query) {
          throw new Error('Error with status' + response.status);
       }
 
-      const result = await response.json();
-      
-      const images = result.hits.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => ({
+      const picturesCards = await response.json();
+
+      const images = picturesCards.hits.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => ({
          webformatURL,
          largeImageURL,
          tags,

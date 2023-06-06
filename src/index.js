@@ -33,14 +33,18 @@ function onSubmit(event) {
    }
 
    API.getPictures(value)
-      .then((result) => {
-         console.log(result);
-         if (result.length === 0) {
-            return Promise.reject(new Error("No data"));
-         }
-         return result;
+      .then((picturesCards) => {
+         console.log(picturesCards);
+         if (picturesCards.length === 0) throw new Error("No data");
+
+         return picturesCards.reduce(
+            (markup, card) => createMarkup(card) + markup, "");
       })
       .catch(onError);
+}
+
+function createMarkup(card) {
+   console.log(card);
 }
 
 function onError(error) { 
