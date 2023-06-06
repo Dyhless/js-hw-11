@@ -13,7 +13,8 @@ async function getPictures(query) {
       return result;
    } catch (error) {
       console.error('Ошибка:', error);
-      throw error; 
+      Notiflix.Notify.failure('Failed to upload images. Please try again later');
+      throw error; // rethrow the error to be caught in the `onError` function
    }
 }
 

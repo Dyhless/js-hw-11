@@ -28,14 +28,20 @@ function onSubmit(event) {
    const value = form.elements.searchQuery.value.trim();
 
    if (value === "") { 
-      return Notiflix.Notify.failure('Please enter something in search field');
+      return Notiflix.Notify.info('Please enter something in the search field');
    }
-   
+
    API.getPictures(value)
-      .then((result) => console.log(result))
+      .then(({hits}) => {
+         console.log(hits);
+         if (hits.length === 0) {
+            return Promise.reject(new Error("No data"));
+         }
+      })
       .catch(onError);
 }
 
 function onError(error) { 
-   console.log(error);
+   console.error(error);
+   Notiflix.Notify.info('Sorry, there are no images matching your search query. Please try again');
 }
