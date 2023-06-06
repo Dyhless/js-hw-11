@@ -28,15 +28,17 @@ function onSubmit(event) {
    const value = form.elements.searchQuery.value.trim();
 
    if (value === "") { 
+      console.error("Nothing to search");
       return Notiflix.Notify.info('Please enter something in the search field');
    }
 
    API.getPictures(value)
-      .then(({hits}) => {
-         console.log(hits);
-         if (hits.length === 0) {
+      .then((result) => {
+         console.log(result);
+         if (result.length === 0) {
             return Promise.reject(new Error("No data"));
          }
+         return result;
       })
       .catch(onError);
 }

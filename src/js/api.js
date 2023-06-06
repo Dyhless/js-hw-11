@@ -9,8 +9,19 @@ async function getPictures(query) {
       if (!response.ok) {
          throw new Error('Error with status' + response.status);
       }
+
       const result = await response.json();
-      return result;
+      
+      const images = result.hits.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => ({
+         webformatURL,
+         largeImageURL,
+         tags,
+         likes,
+         views,
+         comments,
+         downloads
+      }));
+      return images;
    } catch (error) {
       console.error('Ошибка:', error);
       Notiflix.Notify.failure('Failed to upload images. Please try again later');
