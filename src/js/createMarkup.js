@@ -4,7 +4,7 @@ export function createMarkup({
 }) {
    return `
    <div class="photo-card">
-      <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+      <img src="${webformatURL}" alt="${tags}" loading="lazy" class="image-card" />
       <div class="info">
          <p class="info-item">
             <b>${likes}</b>

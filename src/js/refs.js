@@ -1,5 +1,4 @@
 export const refs = {
-   form: document.getElementById('search-form'),
-   searchPictures: document.querySelector('gallery'),
-}
-
+  form: document.getElementById('search-form'),
+  imageGallery: document.getElementById('.gallery'),
+};

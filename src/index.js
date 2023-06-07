@@ -1,12 +1,12 @@
-import axios from 'axios';
-import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
+import axios from 'axios';
+import Notiflix from 'notiflix';
 
 import { refs } from './js/refs.js';
 import API from './js/api.js';
-
 import { createMarkup } from './js/createMarkup.js';
+
 
 /*
 
@@ -47,10 +47,10 @@ function onSubmit(event) {
 }
 
 function updateImageList(markup) { 
-   refs.searchPictures.innerHTML = markup;
+   refs.imageGallery.innerHTML = markup;
 
    // Initialization SimpleLightbox
-   const lightbox = new SimpleLightbox('.photo-card a');
+   const lightbox = new SimpleLightbox('.photo-card img');
    lightbox.open();
 }
 
