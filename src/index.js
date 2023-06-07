@@ -7,6 +7,7 @@ import { refs } from './js/refs.js';
 
 let currentPage = 1;
 let lightbox;
+let currentQuery = '';
 
 refs.form.addEventListener('submit', onSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
@@ -21,8 +22,9 @@ function onSubmit(event) {
     return Notiflix.Notify.info('Please enter something in the search field');
   }
 
-  currentPage = 1; 
-  fetchImages(value, currentPage);
+  currentQuery = value;
+  currentPage = 1;
+  fetchImages(currentQuery, currentPage);
 }
 
 function fetchImages(query, page) {
@@ -35,7 +37,8 @@ function fetchImages(query, page) {
       const markup = images.reduce((acc, card) => acc + createMarkup(card), '');
       updateImageList(markup);
 
-      updateLoadMoreBtn(images.length < totalHits);
+      const hasMoreImages = images.length < totalHits;
+      updateLoadMoreBtn(hasMoreImages);
 
       Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
     })
@@ -48,7 +51,7 @@ function onError(error) {
 }
 
 function updateImageList(markup) {
-  refs.imageGallery.innerHTML = markup;
+  refs.imageGallery.insertAdjacentHTML('beforeend', markup);
   initializeLightbox();
 }
 
@@ -69,4 +72,9 @@ function updateLoadMoreBtn(hasMoreImages) {
     refs.loadMoreBtn.classList.add('hidden');
     Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
   }
+}
+
+function onLoadMore() {
+  currentPage += 1;
+  fetchImages(currentQuery, currentPage);
 }
