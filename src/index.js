@@ -6,6 +6,8 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 import { refs } from './js/refs.js';
 import API from './js/api.js';
 
+import { createMarkup } from './js/createMarkup.js';
+
 /*
 
 1. Get refs 
@@ -34,17 +36,22 @@ function onSubmit(event) {
 
    API.getPictures(value)
       .then((picturesCards) => {
-         console.log(picturesCards);
+         // console.log(picturesCards);
          if (picturesCards.length === 0) throw new Error("No data");
 
          return picturesCards.reduce(
-            (markup, card) => createMarkup(card) + markup, "");
+            (markup, card) => markup + createMarkup(card), "");
       })
+      .then(updateImageList)
       .catch(onError);
 }
 
-function createMarkup(card) {
-   console.log(card);
+function updateImageList(markup) { 
+   refs.searchPictures.innerHTML = markup;
+
+   // Initialization SimpleLightbox
+   const lightbox = new SimpleLightbox('.photo-card a');
+   lightbox.open();
 }
 
 function onError(error) { 
