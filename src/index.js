@@ -2,7 +2,6 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import axios from 'axios';
 import Notiflix from 'notiflix';
-import * as Notiflix from 'notiflix';
 
 import { refs } from './js/refs.js';
 import API from './js/api.js';
@@ -23,31 +22,44 @@ import { createMarkup } from './js/createMarkup.js';
 
 */
 
+let currentPage = 1;
+
 refs.form.addEventListener('submit', onSubmit);
 
-function onSubmit(event) { 
+function onSubmit(event) {
    event.preventDefault();
    const form = event.currentTarget;
    const value = form.elements.searchQuery.value.trim();
 
-   if (value === "") { 
+   if (value === "") {
       console.error("Nothing to search");
       return Notiflix.Notify.info('Please enter something in the search field');
    }
 
-   API.getPictures(value)
-      .then((picturesCards) => {
-         // console.log(picturesCards);
-         if (picturesCards.length === 0) throw new Error("No data");
+   currentPage = 1; // Сброс значения текущей страницы при новом поиске
+   fetchImages(value, currentPage);
+}
 
-         return picturesCards.reduce(
-            (markup, card) => markup + createMarkup(card), "");
+function fetchImages(query, page) {
+   API.getPictures(query, page)
+      .then(({ images, totalHits }) => {
+         if (images.length === 0) throw new Error("No data");
+
+         const markup = images.reduce((acc, card) => acc + createMarkup(card), "");
+         updateImageList(markup);
+
+         const imagesLength = images.length;
+         updateLoadMoreBtn(totalHits, imagesLength);
       })
-      .then(updateImageList)
       .catch(onError);
 }
 
-function updateImageList(markup) { 
+function onError(error) {
+   console.error(error);
+   Notiflix.Notify.info('Sorry, there are no images matching your search query. Please try again');
+}
+
+function updateImageList(markup) {
    refs.imageGallery.innerHTML = markup;
 
    // Initialization SimpleLightbox
@@ -55,7 +67,20 @@ function updateImageList(markup) {
    lightbox.open();
 }
 
-function onError(error) { 
-   console.error(error);
-   Notiflix.Notify.info('Sorry, there are no images matching your search query. Please try again');
+function updateLoadMoreBtn(totalHits, imagesLength) {
+   if (imagesLength < totalHits) {
+      refs.loadMoreBtn.style.display = 'block';
+   } else {
+      refs.loadMoreBtn.style.display = 'none';
+      Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+   }
 }
+
+refs.loadMoreBtn.addEventListener('click', onLoadMore);
+
+function onLoadMore() {
+   currentPage += 1; // Увеличение значения текущей страницы при нажатии на кнопку "Load more"
+   const value = refs.form.elements.searchQuery.value.trim();
+   fetchImages(value, currentPage);
+}
+
