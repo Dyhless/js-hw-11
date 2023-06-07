@@ -1,4 +1,3 @@
-
 import Notiflix from 'notiflix';
 
 const BASE_URL = 'https://pixabay.com/api/';
@@ -26,15 +25,16 @@ async function getPictures(query, page = 1, perPage = 40) {
          comments,
          downloads
       }));
+
+      const totalHits = data.totalHits;
       return {
          images,
-         totalHits: data.totalHits
+         totalHits
       };
    } catch (error) {
       console.error('Error:', error);
       Notiflix.Notify.failure('Failed to fetch images. Please try again later');
    }
 }
-
 
 export default { getPictures };

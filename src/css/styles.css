@@ -1,3 +1,38 @@
 .load-more {
    margin-top: 10px;
 }
+
+.photo-gallery {
+   display: flex;
+   gap: 20px;
+}
+
+
+.photo-card {
+   border-radius: 8px;
+   overflow: hidden;
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.photo-link {
+   display: block;
+}
+
+.image-card {
+   width: auto;
+   max-width: 50%;
+   height: auto;
+}
+
+.info {
+   padding: 10px;
+   background-color: #fff;
+   display: flex;
+   justify-content: space-between;
+}
+
+.info-item {
+   flex: 1;
+   text-align: center;
+   margin-right: 10px;
+}
