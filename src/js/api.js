@@ -5,9 +5,11 @@ const API_KEY = '37053026-4150c05ae3a340932daa6308e';
 
 async function getPictures(query, page = 1, perPage = 40) {
    try {
-      const response = await fetch(`${BASE_URL}?key=${API_KEY}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${perPage}`);
+      const url = `${BASE_URL}?key=${API_KEY}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${perPage}`;
+      const response = await fetch(url);
+
       if (!response.ok) {
-         throw new Error('Error with status' + response.status);
+         throw new Error('Error with status ' + response.status);
       }
 
       const data = await response.json();
@@ -16,17 +18,9 @@ async function getPictures(query, page = 1, perPage = 40) {
          throw new Error('Invalid data format');
       }
 
-      const images = data.hits.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => ({
-         webformatURL,
-         largeImageURL,
-         tags,
-         likes,
-         views,
-         comments,
-         downloads
-      }));
-
+      const images = data.hits.map(formatImageData);
       const totalHits = data.totalHits;
+
       return {
          images,
          totalHits
@@ -34,7 +28,20 @@ async function getPictures(query, page = 1, perPage = 40) {
    } catch (error) {
       console.error('Error:', error);
       Notiflix.Notify.failure('Failed to fetch images. Please try again later');
+      throw error;
    }
+}
+
+function formatImageData({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) {
+   return {
+      webformatURL,
+      largeImageURL,
+      tags,
+      likes,
+      views,
+      comments,
+      downloads
+   };
 }
 
 function openImage(imageURL) {
@@ -57,4 +64,8 @@ function createImageCard(image) {
    return card;
 }
 
-export default { getPictures, createImageCard };
+export default {
+   getPictures,
+   createImageCard,
+   openImage
+};
