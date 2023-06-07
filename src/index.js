@@ -61,6 +61,15 @@ function initializeLightbox() {
    }
 }
 
+function updateLoadMoreBtn(totalHits, imagesLength) {
+   if (imagesLength < totalHits) {
+      refs.loadMoreBtn.style.display = 'block';
+   } else {
+      refs.loadMoreBtn.style.display = 'none';
+      Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+   }
+}
+
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
 function onLoadMore() {
