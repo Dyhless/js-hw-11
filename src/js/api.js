@@ -12,7 +12,7 @@ async function getPictures(query) {
 
       const picturesCards = await response.json();
 
-      const images = picturesCards.hits.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => ({
+      const images = picturesCards.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => ({
          webformatURL,
          largeImageURL,
          tags,
