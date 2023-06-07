@@ -2,6 +2,7 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import axios from 'axios';
 import Notiflix from 'notiflix';
+import * as Notiflix from 'notiflix';
 
 import { refs } from './js/refs.js';
 import API from './js/api.js';

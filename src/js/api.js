@@ -11,7 +11,11 @@ async function getPictures(query) {
 
       const picturesCards = await response.json();
 
-      const images = picturesCards.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => ({
+      if (!Array.isArray(picturesCards)) {
+         throw new Error('Invalid data format');
+      }
+
+      const images = picturesCards.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => ({
          webformatURL,
          largeImageURL,
          tags,
@@ -24,8 +28,9 @@ async function getPictures(query) {
    } catch (error) {
       console.error('Error:', error);
       Notiflix.Notify.failure('Failed to upload images. Please try again later');
-      throw error; // rethrow the error to be caught in the `onError` function
+      throw error;
    }
 }
+
 
 export default { getPictures };
