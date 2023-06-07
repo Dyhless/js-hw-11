@@ -1,3 +1,4 @@
+
 import Notiflix from 'notiflix';
 
 const BASE_URL = 'https://pixabay.com/api/';
