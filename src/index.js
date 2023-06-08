@@ -26,7 +26,8 @@ async function onSubmit(event) {
   currentPage = 1;
 
   try {
-    await fetchImages();
+     await fetchImages();
+     refs.form.reset();
   } catch (error) {
     onError(error);
   }
