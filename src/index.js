@@ -25,12 +25,17 @@ async function onSubmit(event) {
   currentQuery = value;
   currentPage = 1;
 
-  try {
+   try {
+     clearImageGallery();
      await fetchImages();
      refs.form.reset();
   } catch (error) {
     onError(error);
   }
+}
+
+function clearImageGallery() {
+  refs.imageGallery.innerHTML = '';
 }
 
 async function fetchImages() {
