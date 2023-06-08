@@ -18,6 +18,4 @@ function createImageCard(image) {
    return card;
 }
 
-
-
 export { createImageCard, openImage };
