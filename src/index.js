@@ -12,7 +12,7 @@ let currentQuery = '';
 refs.form.addEventListener('submit', onSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
-function onSubmit(event) {
+async function onSubmit(event) {
   event.preventDefault();
   const { searchQuery } = refs.form.elements;
   const value = searchQuery.value.trim();
@@ -24,27 +24,32 @@ function onSubmit(event) {
 
   currentQuery = value;
   currentPage = 1;
-  fetchImages();
-}
 
-function fetchImages() {
-  API.getPictures(currentQuery, currentPage)
-    .then(handleImagesResponse)
-    .catch(onError);
-}
-
-function handleImagesResponse({ images, totalHits }) {
-  if (images.length === 0) {
-    throw new Error('No data');
+  try {
+    await fetchImages();
+  } catch (error) {
+    onError(error);
   }
+}
 
-  const markup = images.reduce((acc, card) => acc + createMarkup(card), '');
-  updateImageList(markup);
+async function fetchImages() {
+  try {
+    const { images, totalHits } = await API.getPictures(currentQuery, currentPage);
 
-  const hasMoreImages = images.length < totalHits;
-  updateLoadMoreBtn(hasMoreImages);
+    if (images.length === 0) {
+      throw new Error('No data');
+    }
 
-  Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+    const markup = images.reduce((acc, card) => acc + createMarkup(card), '');
+    updateImageList(markup);
+
+    const hasMoreImages = images.length < totalHits;
+    updateLoadMoreBtn(hasMoreImages);
+
+    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+  } catch (error) {
+    throw new Error('Failed to fetch images');
+  }
 }
 
 function onError(error) {
@@ -75,7 +80,12 @@ function updateLoadMoreBtn(hasMoreImages) {
   }
 }
 
-function onLoadMore() {
+async function onLoadMore() {
   currentPage += 1;
-  fetchImages();
+
+  try {
+    await fetchImages();
+  } catch (error) {
+    onError(error);
+  }
 }
