@@ -18,4 +18,4 @@ function createImageCard(image) {
    return card;
 }
 
-export { createImageCard, openImage };
+export default { createImageCard, openImage };

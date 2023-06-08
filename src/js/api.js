@@ -44,4 +44,4 @@ function formatImageData({ webformatURL, largeImageURL, tags, likes, views, comm
    };
 }
 
-export { getPictures, formatImageData };
+export default { getPictures, formatImageData };
