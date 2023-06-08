@@ -4,6 +4,7 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import API from './js/api.js';
 import { createMarkup } from './js/createMarkup.js';
 import { refs } from './js/refs.js';
+import { createImageCard, openImage } from './js/imageCard.js';
 
 let currentPage = 1;
 let lightbox;
