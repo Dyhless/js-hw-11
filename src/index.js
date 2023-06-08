@@ -24,25 +24,27 @@ function onSubmit(event) {
 
   currentQuery = value;
   currentPage = 1;
-  fetchImages(currentQuery, currentPage);
+  fetchImages();
 }
 
-function fetchImages(query, page) {
-  API.getPictures(query, page)
-    .then(({ images, totalHits }) => {
-      if (images.length === 0) {
-        throw new Error('No data');
-      }
-
-      const markup = images.reduce((acc, card) => acc + createMarkup(card), '');
-      updateImageList(markup);
-
-      const hasMoreImages = images.length < totalHits;
-      updateLoadMoreBtn(hasMoreImages);
-
-      Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
-    })
+function fetchImages() {
+  API.getPictures(currentQuery, currentPage)
+    .then(handleImagesResponse)
     .catch(onError);
+}
+
+function handleImagesResponse({ images, totalHits }) {
+  if (images.length === 0) {
+    throw new Error('No data');
+  }
+
+  const markup = images.reduce((acc, card) => acc + createMarkup(card), '');
+  updateImageList(markup);
+
+  const hasMoreImages = images.length < totalHits;
+  updateLoadMoreBtn(hasMoreImages);
+
+  Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
 }
 
 function onError(error) {
@@ -60,21 +62,20 @@ function initializeLightbox() {
     lightbox.refresh();
   } else {
     lightbox = new SimpleLightbox('.photo-card a', {
-      errorText: false, 
+      errorText: false,
     });
   }
 }
 
 function updateLoadMoreBtn(hasMoreImages) {
-  if (hasMoreImages) {
-    refs.loadMoreBtn.classList.remove('hidden');
-  } else {
-    refs.loadMoreBtn.classList.add('hidden');
+  refs.loadMoreBtn.classList.toggle('hidden', !hasMoreImages);
+
+  if (!hasMoreImages) {
     Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
   }
 }
 
 function onLoadMore() {
   currentPage += 1;
-  fetchImages(currentQuery, currentPage);
+  fetchImages();
 }
