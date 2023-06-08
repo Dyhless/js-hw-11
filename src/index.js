@@ -59,7 +59,7 @@ function onError(error) {
 }
 
 function updateImageList(markup) {
-  refs.imageGallery.innerHTML = markup;
+  refs.imageGallery.insertAdjacentHTML('beforeend', markup);
   initializeLightbox();
 }
 
