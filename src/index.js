@@ -48,7 +48,7 @@ async function fetchImages() {
 
     Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
   } catch (error) {
-    throw new Error('Failed to fetch images');
+    onError(error);
   }
 }
 
@@ -58,7 +58,7 @@ function onError(error) {
 }
 
 function updateImageList(markup) {
-  refs.imageGallery.insertAdjacentHTML('beforeend', markup);
+  refs.imageGallery.innerHTML = markup;
   initializeLightbox();
 }
 
