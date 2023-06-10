@@ -81,6 +81,9 @@ button[type="submit"]:hover {
 }
 
 .load-more {
+   display: flex;
+   justify-content: center;
+   align-items: center;
    margin: 20px auto;
    padding: 10px 20px;
    border: none;
