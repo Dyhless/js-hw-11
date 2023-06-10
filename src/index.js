@@ -44,16 +44,16 @@ function clearImageGallery() {
 
 async function fetchImages() {
   try {
-    const { images, totalHits } = await API.getPictures(currentQuery, currentPage);
+    const { hits, totalHits } = await API.getPictures(currentQuery, currentPage);
 
-    if (images.length === 0) {
+    if (hits.length === 0) {
       throw new Error('No data');
     }
 
-    const markup = images.reduce((acc, card) => acc + createMarkup(card), '');
+    const markup = hits.reduce((acc, card) => acc + createMarkup(card), '');
     updateImageList(markup);
      
-    const hasMoreImages = images.length < totalHits;
+    const hasMoreImages = hits.length < totalHits;
     updateLoadMoreBtn(hasMoreImages);
 
     if (currentPage === 1) {
@@ -63,6 +63,7 @@ async function fetchImages() {
     onError(error);
   }
 }
+
 
 function updateImageList(markup) {
   refs.imageGallery.insertAdjacentHTML('beforeend', markup);
