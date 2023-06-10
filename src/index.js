@@ -9,6 +9,8 @@ let currentPage = 1;
 let lightbox;
 let currentQuery = '';
 
+refs.loadMoreBtn.classList.add('hidden');
+
 refs.form.addEventListener('submit', onSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
@@ -22,6 +24,7 @@ async function onSubmit(event) {
     console.error('Nothing to search');
     return Notiflix.Notify.info('Please enter something in the search field');
   }
+
 
   currentQuery = value;
   currentPage = 1;
@@ -88,8 +91,6 @@ function updateLoadMoreBtn(hasMoreImages) {
   }
 }
 
-refs.loadMoreBtn.classList.add('hidden');
-
 async function onLoadMore() {
   currentPage += 1;
 
@@ -99,3 +100,4 @@ async function onLoadMore() {
     onError(error);
   }
 }
+
