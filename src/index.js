@@ -32,7 +32,6 @@ async function onSubmit(event) {
     clearImageGallery();
     await fetchImages();
     refs.form.reset();
-    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
   } catch (error) {
     onError(error);
   }
@@ -59,6 +58,10 @@ async function fetchImages() {
     updateImageList(markup);
 
     updateLoadMoreBtn(hasMoreImages);
+
+    if (currentPage === 1) {
+      Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+    }
   } catch (error) {
     onError(error);
   }
