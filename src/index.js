@@ -85,6 +85,7 @@ function updateLoadMoreBtn(hasMoreImages) {
     refs.loadMoreBtn.classList.add('hidden');
     if (loadedImages === totalHits) {
       Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+      refs.loadMoreBtn.removeEventListener('click', onLoadMore);
     }
   } else {
     refs.loadMoreBtn.classList.remove('hidden');
@@ -94,10 +95,11 @@ function updateLoadMoreBtn(hasMoreImages) {
 function onError(error) {
   console.error(error);
   refs.loadMoreBtn.classList.add('hidden');
-  if (loadedImages === totalHits) {
-    Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
-  } else {
-    Notiflix.Notify.info('Sorry, there are no images matching your search query');
+  if (loadedImages === 0) {
+    Notiflix.Notify.failure('Sorry, there are no images matching your search query');
+  } else if (loadedImages === totalHits) {
+    Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
+    refs.loadMoreBtn.removeEventListener('click', onLoadMore);
   }
 }
 
