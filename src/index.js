@@ -44,20 +44,23 @@ function clearImageGallery() {
 
 async function fetchImages() {
   try {
-    const { images, totalHits } = await API.getPictures(currentQuery, currentPage);
+   const { images, totalHits } = await API.getPictures(currentQuery, currentPage);
    
-    if (images.length === 0) {
-      throw new Error('No data');
-    }
+   if (images.length === 0) {
+   throw new Error('No data');
+   }
      
-    const hasMoreImages = images.length < totalHits;
+   const hasMoreImages = images.length < totalHits;
      
-    const markup = images.reduce((acc, card) => acc + createMarkup(card), '');
-    updateImageList(markup);
+   const markup = images.reduce((acc, card) => acc + createMarkup(card), '');
+   updateImageList(markup);
 
-    updateLoadMoreBtn(hasMoreImages);
+   updateLoadMoreBtn(hasMoreImages);
 
-    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+   Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+     
+   refs.loadMoreBtn.classList.remove('hidden');
+     
   } catch (error) {
     onError(error);
   }
