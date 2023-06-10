@@ -12,6 +12,7 @@ let currentQuery = '';
 refs.form.addEventListener('submit', onSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
+
 async function onSubmit(event) {
   event.preventDefault();
   const { searchQuery } = refs.form.elements;
@@ -41,15 +42,16 @@ function clearImageGallery() {
 async function fetchImages() {
   try {
     const { images, totalHits } = await API.getPictures(currentQuery, currentPage);
-
+   
     if (images.length === 0) {
       throw new Error('No data');
     }
-
+     
+    const hasMoreImages = images.length < totalHits;
+     
     const markup = images.reduce((acc, card) => acc + createMarkup(card), '');
     updateImageList(markup);
 
-    const hasMoreImages = images.length < totalHits;
     updateLoadMoreBtn(hasMoreImages);
 
     Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
@@ -85,6 +87,8 @@ function updateLoadMoreBtn(hasMoreImages) {
     Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
   }
 }
+
+refs.loadMoreBtn.classList.add('hidden');
 
 async function onLoadMore() {
   currentPage += 1;
