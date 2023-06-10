@@ -12,7 +12,6 @@ let totalHits = 0;
 let loadedImages = 0;
 
 refs.loadMoreBtn.classList.add('hidden');
-
 refs.form.addEventListener('submit', onSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
