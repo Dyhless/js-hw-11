@@ -66,6 +66,10 @@ button[type="submit"]:hover {
    transition: filter 0.3s ease;
 }
 
+.hidden {
+   display: block;
+}
+
 .card-image {
    display: block;
    width: 100%;
