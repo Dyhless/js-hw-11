@@ -44,19 +44,16 @@ function clearImageGallery() {
 
 async function fetchImages() {
   try {
-    const { images, total } = await API.getPictures(currentQuery, currentPage);
+    const { images, totalHits } = await API.getPictures(currentQuery, currentPage);
 
     if (images.length === 0) {
       throw new Error('No data');
     }
 
-    totalHits = total;
-
-    const hasMoreImages = images.length < totalHits;
-
     const markup = images.reduce((acc, card) => acc + createMarkup(card), '');
     updateImageList(markup);
-
+     
+    const hasMoreImages = images.length < totalHits;
     updateLoadMoreBtn(hasMoreImages);
 
     if (currentPage === 1) {
@@ -101,7 +98,7 @@ function onError(error) {
   if (loadedImages === 0) {
     Notiflix.Notify.failure('Sorry, there are no images matching your search query');
   } else if (loadedImages === totalHits) {
-    Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
+    Notiflix.Notify.failure("We're sorry, but you've reached the end of search results");
     refs.loadMoreBtn.removeEventListener('click', onLoadMore);
   }
 }
