@@ -8,12 +8,13 @@ import { refs } from './js/refs.js';
 let currentPage = 1;
 let lightbox;
 let currentQuery = '';
+let totalHits = 0;
+let loadedImages = 0;
 
 refs.loadMoreBtn.classList.add('hidden');
 
 refs.form.addEventListener('submit', onSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
-
 
 async function onSubmit(event) {
   event.preventDefault();
@@ -25,14 +26,13 @@ async function onSubmit(event) {
     return Notiflix.Notify.info('Please enter something in the search field');
   }
 
-
   currentQuery = value;
   currentPage = 1;
 
-   try {
-     clearImageGallery();
-     await fetchImages();
-     refs.form.reset();
+  try {
+    clearImageGallery();
+    await fetchImages();
+    refs.form.reset();
   } catch (error) {
     onError(error);
   }
@@ -40,40 +40,38 @@ async function onSubmit(event) {
 
 function clearImageGallery() {
   refs.imageGallery.innerHTML = '';
+  loadedImages = 0;
 }
 
 async function fetchImages() {
   try {
-   const { images, totalHits } = await API.getPictures(currentQuery, currentPage);
-   
-   if (images.length === 0) {
-   throw new Error('No data');
-   }
-     
-   const hasMoreImages = images.length < totalHits;
-     
-   const markup = images.reduce((acc, card) => acc + createMarkup(card), '');
-   updateImageList(markup);
+    const { images, total } = await API.getPictures(currentQuery, currentPage);
 
-   updateLoadMoreBtn(hasMoreImages);
+    if (images.length === 0) {
+      throw new Error('No data');
+    }
 
-   Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
-     
-   refs.loadMoreBtn.classList.remove('hidden');
-     
+    totalHits = total;
+
+    const hasMoreImages = images.length < totalHits;
+
+    const markup = images.reduce((acc, card) => acc + createMarkup(card), '');
+    updateImageList(markup);
+
+    updateLoadMoreBtn(hasMoreImages);
+
+    if (currentPage === 1) {
+      Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+    }
   } catch (error) {
     onError(error);
   }
 }
 
-function onError(error) {
-  console.error(error);
-  Notiflix.Notify.info('Sorry, there are no images matching your search query');
-}
-
 function updateImageList(markup) {
   refs.imageGallery.insertAdjacentHTML('beforeend', markup);
   initializeLightbox();
+  loadedImages += 1;
 }
 
 function initializeLightbox() {
@@ -87,9 +85,21 @@ function initializeLightbox() {
 }
 
 function updateLoadMoreBtn(hasMoreImages) {
-  refs.loadMoreBtn.classList.toggle('hidden', !hasMoreImages);
-
   if (!hasMoreImages) {
+    refs.loadMoreBtn.classList.add('hidden');
+    if (loadedImages === totalHits) {
+      Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+    }
+  } else {
+    refs.loadMoreBtn.classList.remove('hidden');
+  }
+}
+
+function onError(error) {
+  console.error(error);
+  Notiflix.Notify.info('Sorry, there are no images matching your search query');
+  refs.loadMoreBtn.classList.add('hidden');
+  if (loadedImages === totalHits) {
     Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
   }
 }
@@ -103,4 +113,3 @@ async function onLoadMore() {
     onError(error);
   }
 }
-
