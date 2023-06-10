@@ -52,6 +52,9 @@ button[type="submit"]:hover {
    grid-template-columns: repeat(4, 1fr);
    gap: 10px;
    padding: 0 10px;
+   justify-items: center;
+   align-items: center;
+
 }
 
 .card {
@@ -78,7 +81,6 @@ button[type="submit"]:hover {
 }
 
 .load-more {
-   display: none;
    margin: 20px auto;
    padding: 10px 20px;
    border: none;
@@ -88,6 +90,10 @@ button[type="submit"]:hover {
    font-size: 16px;
    cursor: pointer;
    transition: background-color 0.3s ease;
+}
+
+.hidden {
+   display: none;
 }
 
 .load-more:hover {
