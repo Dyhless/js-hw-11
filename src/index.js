@@ -5,47 +5,50 @@ import API from './js/api.js';
 import { createMarkup } from './js/createMarkup.js';
 import { refs } from './js/refs.js';
 
+const { form, loadMoreBtn, imageGallery } = refs;
+const lightbox = new SimpleLightbox('.photo-card a', { errorText: false });
 let currentPage = 1;
-let lightbox;
+let currentQuery = '';
+let totalHits = 0;
 
-refs.loadMoreBtn.classList.add('hidden');
-refs.form.addEventListener('submit', onSubmit);
-refs.loadMoreBtn.addEventListener('click', onLoadMore);
+loadMoreBtn.classList.add('hidden');
+form.addEventListener('submit', onSubmit);
+loadMoreBtn.addEventListener('click', onLoadMore);
 
 async function onSubmit(event) {
   event.preventDefault();
-  const { searchQuery } = refs.form.elements;
-  const value = searchQuery.value.trim();
+  const value = form.elements.searchQuery.value.trim();
 
   if (value === '') {
     console.error('Nothing to search');
     return Notiflix.Notify.info('Please enter something in the search field');
   }
 
+  currentQuery = value;
   currentPage = 1;
 
   try {
-    clearImageGallery();
-    await fetchImages(value);
-    refs.form.reset();
+    await fetchImages();
+    form.reset();
   } catch (error) {
     onError(error);
   }
 }
 
 function clearImageGallery() {
-  refs.imageGallery.innerHTML = '';
+  imageGallery.innerHTML = '';
 }
 
-async function fetchImages(value) {
+async function fetchImages() {
   try {
-    const { hits, totalHits } = await API.getPictures(value, currentPage);
+    const { hits, totalHits: currentTotalHits } = await API.getPictures(currentQuery, currentPage);
 
     if (hits.length === 0) {
       throw new Error('No data');
     }
 
-    const markup = hits.map(card => createMarkup(card)).join('');
+    totalHits = currentTotalHits;
+    const markup = hits.map(createMarkup).join('');
     updateImageList(markup);
 
     const hasMoreImages = hits.length < totalHits;
@@ -60,32 +63,22 @@ async function fetchImages(value) {
 }
 
 function updateImageList(markup) {
-  refs.imageGallery.insertAdjacentHTML('beforeend', markup);
-  initializeLightbox();
-}
-
-function initializeLightbox() {
-  if (lightbox) {
-    lightbox.refresh();
-  } else {
-    lightbox = new SimpleLightbox('.photo-card a', {
-      errorText: false,
-    });
-  }
+  imageGallery.insertAdjacentHTML('beforeend', markup);
+  lightbox.refresh();
 }
 
 function updateLoadMoreBtn(hasMoreImages) {
-  refs.loadMoreBtn.classList.toggle('hidden', !hasMoreImages);
+  loadMoreBtn.classList.toggle('hidden', !hasMoreImages);
 
   if (!hasMoreImages && currentPage === 1) {
     Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
-    refs.loadMoreBtn.removeEventListener('click', onLoadMore);
+    loadMoreBtn.removeEventListener('click', onLoadMore);
   }
 }
 
 function onError(error) {
   console.error(error);
-  refs.loadMoreBtn.classList.add('hidden');
+  loadMoreBtn.classList.add('hidden');
 
   const failureMessage =
     totalHits === 0
@@ -94,7 +87,7 @@ function onError(error) {
   Notiflix.Notify.failure(failureMessage);
 
   if (totalHits > 0) {
-    refs.loadMoreBtn.removeEventListener('click', onLoadMore);
+    loadMoreBtn.removeEventListener('click', onLoadMore);
   }
 }
 
@@ -102,11 +95,11 @@ async function onLoadMore() {
   currentPage += 1;
 
   try {
-    await fetchImages(currentQuery);
+    await fetchImages();
     if (currentPage > 1 && totalHits === 0) {
       Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
-      refs.loadMoreBtn.classList.add('hidden');
-      refs.loadMoreBtn.removeEventListener('click', onLoadMore);
+      loadMoreBtn.classList.add('hidden');
+      loadMoreBtn.removeEventListener('click', onLoadMore);
     }
   } catch (error) {
     onError(error);
