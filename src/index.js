@@ -15,6 +15,8 @@ class ImageGallery {
     this.currentPage = 1;
     this.currentQuery = '';
     this.totalHits = 0;
+    this.perPage = 40;
+    this.isEndOfResults = false;
 
     this.loadMoreBtn.classList.add('hidden');
     this.form.addEventListener('submit', this.onSubmit.bind(this));
@@ -26,8 +28,9 @@ class ImageGallery {
     const value = this.form.elements.searchQuery.value.trim();
 
     if (!value) {
-      console.error('Nothing to search');
-      return Notiflix.Notify.info('Please enter something in the search field');
+      this.clearPage();
+      Notiflix.Notify.failure('Please enter something in the search field.');
+      return;
     }
 
     this.currentQuery = value;
@@ -37,29 +40,44 @@ class ImageGallery {
       await this.fetchImages();
       this.form.reset();
     } catch (error) {
-      this.onError(error);
+      console.error(error);
+    }
+  }
+
+  clearPage() {
+    this.imageGallery.innerHTML = '';
+    this.hideLoadMoreBtn();
+  }
+
+  onError(error) {
+    console.error(error);
+
+    if (this.totalHits === 0) {
+      this.clearPage();
+      Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
     }
   }
 
   async fetchImages() {
     try {
-      const { hits, totalHits: currentTotalHits } = await API.getPictures(
-        this.currentQuery,
-        this.currentPage
-      );
+      const { hits, totalHits } = await API.getPictures(this.currentQuery, this.currentPage, this.perPage);
 
-      if (!hits.length) {
-        throw new Error('No data');
+      if (!hits.length && this.currentPage === 1) {
+        this.hideLoadMoreBtn();
+        Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+        this.clearPage(); 
+        return;
       }
 
-      this.totalHits = currentTotalHits;
+      this.totalHits = totalHits;
       const markup = hits.map(createMarkup).join('');
-      this.updateImageList(markup);
+      this.renderImages(markup);
 
-      const hasMoreImages = hits.length < this.totalHits;
+      const totalPages = Math.ceil(this.totalHits / this.perPage);
+      const hasMoreImages = this.currentPage < totalPages;
       this.updateLoadMoreBtn(hasMoreImages);
 
-      if (this.currentPage === 1) {
+      if (this.currentPage === 1 && !this.isEndOfResults) {
         Notiflix.Notify.success(`Hooray! We found ${this.totalHits} images.`);
       }
     } catch (error) {
@@ -67,7 +85,7 @@ class ImageGallery {
     }
   }
 
-  updateImageList(markup) {
+  renderImages(markup) {
     if (this.currentPage === 1) {
       this.imageGallery.innerHTML = markup;
     } else {
@@ -77,27 +95,25 @@ class ImageGallery {
   }
 
   updateLoadMoreBtn(hasMoreImages) {
-    this.loadMoreBtn.classList.toggle('hidden', !hasMoreImages);
-
-    if (!hasMoreImages && this.currentPage === 1) {
-      Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
-      this.loadMoreBtn.removeEventListener('click', this.onLoadMore.bind(this));
+    if (hasMoreImages) {
+      this.showLoadMoreBtn();
+    } else {
+      this.hideLoadMoreBtn();
+      if (!this.isEndOfResults) {
+        Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+        this.isEndOfResults = true;
+      }
+      this.loadMoreBtn.removeEventListener('click', this.onLoadMore);
     }
   }
 
-  onError(error) {
-    console.error(error);
+  showLoadMoreBtn() {
+    this.loadMoreBtn.classList.remove('hidden');
+    this.loadMoreBtn.addEventListener('click', this.onLoadMore.bind(this));
+  }
+
+  hideLoadMoreBtn() {
     this.loadMoreBtn.classList.add('hidden');
-
-    const failureMessage =
-      this.totalHits === 0
-        ? 'Sorry, there are no images matching your search query'
-        : "We're sorry, but you've reached the end of search results";
-    Notiflix.Notify.failure(failureMessage);
-
-    if (this.totalHits > 0) {
-      this.loadMoreBtn.removeEventListener('click', this.onLoadMore.bind(this));
-    }
   }
 
   async onLoadMore() {
@@ -105,11 +121,6 @@ class ImageGallery {
 
     try {
       await this.fetchImages();
-      if (this.currentPage > 1 && this.totalHits === 0) {
-        Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
-        this.loadMoreBtn.classList.add('hidden');
-        this.loadMoreBtn.removeEventListener('click', this.onLoadMore.bind(this));
-      }
     } catch (error) {
       this.onError(error);
     }
