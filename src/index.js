@@ -19,7 +19,7 @@ async function onSubmit(event) {
   event.preventDefault();
   const value = form.elements.searchQuery.value.trim();
 
-  if (value === '') {
+  if (!value) {
     console.error('Nothing to search');
     return Notiflix.Notify.info('Please enter something in the search field');
   }
@@ -43,7 +43,7 @@ async function fetchImages() {
   try {
     const { hits, totalHits: currentTotalHits } = await API.getPictures(currentQuery, currentPage);
 
-    if (hits.length === 0) {
+    if (!hits.length) {
       throw new Error('No data');
     }
 
@@ -80,10 +80,9 @@ function onError(error) {
   console.error(error);
   loadMoreBtn.classList.add('hidden');
 
-  const failureMessage =
-    totalHits === 0
-      ? 'Sorry, there are no images matching your search query'
-      : "We're sorry, but you've reached the end of search results";
+  const failureMessage = totalHits === 0
+    ? 'Sorry, there are no images matching your search query'
+    : "We're sorry, but you've reached the end of search results";
   Notiflix.Notify.failure(failureMessage);
 
   if (totalHits > 0) {
