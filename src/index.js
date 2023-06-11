@@ -8,7 +8,6 @@ import { refs } from './js/refs.js';
 let currentPage = 1;
 let lightbox;
 let currentQuery = '';
-let totalHits = 0;
 let loadedImages = 0;
 
 refs.loadMoreBtn.classList.add('hidden');
@@ -44,7 +43,7 @@ function clearImageGallery() {
 
 async function fetchImages() {
   try {
-    const { hits, totalHits } = await API.getPictures(currentQuery, currentPage);
+    const { hits } = await API.getPictures(currentQuery, currentPage);
 
     if (hits.length === 0) {
       throw new Error('No data');
@@ -52,18 +51,17 @@ async function fetchImages() {
 
     const markup = hits.reduce((acc, card) => acc + createMarkup(card), '');
     updateImageList(markup);
-     
-    const hasMoreImages = hits.length < totalHits;
+
+    const hasMoreImages = hits.length < 20; 
     updateLoadMoreBtn(hasMoreImages);
 
     if (currentPage === 1) {
-      Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+      Notiflix.Notify.success(`Hooray! We found ${hits.length} images.`);
     }
   } catch (error) {
     onError(error);
   }
 }
-
 
 function updateImageList(markup) {
   refs.imageGallery.insertAdjacentHTML('beforeend', markup);
@@ -84,7 +82,7 @@ function initializeLightbox() {
 function updateLoadMoreBtn(hasMoreImages) {
   if (!hasMoreImages) {
     refs.loadMoreBtn.classList.add('hidden');
-    if (loadedImages === totalHits) {
+    if (loadedImages >= 20) {
       Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
       refs.loadMoreBtn.removeEventListener('click', onLoadMore);
     }
@@ -98,18 +96,25 @@ function onError(error) {
   refs.loadMoreBtn.classList.add('hidden');
   if (loadedImages === 0) {
     Notiflix.Notify.failure('Sorry, there are no images matching your search query');
-  } else if (loadedImages === totalHits) {
+  } else if (loadedImages >= 20) {
     Notiflix.Notify.failure("We're sorry, but you've reached the end of search results");
     refs.loadMoreBtn.removeEventListener('click', onLoadMore);
   }
 }
+
 
 async function onLoadMore() {
   currentPage += 1;
 
   try {
     await fetchImages();
+    if (loadedImages === 20) {
+      Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+      refs.loadMoreBtn.classList.add('hidden');
+      refs.loadMoreBtn.removeEventListener('click', onLoadMore);
+    }
   } catch (error) {
     onError(error);
   }
 }
+
