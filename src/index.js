@@ -68,7 +68,11 @@ class ImageGallery {
   }
 
   updateImageList(markup) {
-    this.imageGallery.insertAdjacentHTML('beforeend', markup);
+    if (this.currentPage === 1) {
+      this.imageGallery.innerHTML = markup;
+    } else {
+      this.imageGallery.insertAdjacentHTML('beforeend', markup);
+    }
     this.lightbox.refresh();
   }
 
@@ -113,4 +117,3 @@ class ImageGallery {
 }
 
 new ImageGallery();
-
