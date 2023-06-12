@@ -109,7 +109,6 @@ class ImageGallery {
 
   showLoadMoreBtn() {
     this.loadMoreBtn.classList.remove('hidden');
-    this.loadMoreBtn.addEventListener('click', this.onLoadMore.bind(this));
   }
 
   hideLoadMoreBtn() {
